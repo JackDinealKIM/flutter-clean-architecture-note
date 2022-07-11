@@ -1,9 +1,9 @@
-import 'package:clean_architecture_note/data/data_source/note_db.dart';
+import 'package:clean_architecture_note/data/data_source/note_db_helper.dart';
 import 'package:clean_architecture_note/domain/model/note.dart';
 import 'package:clean_architecture_note/domain/repository/note_repository.dart';
 
 class NoteRepositoryImpl extends NoteRepository {
-  final NoteDB db;
+  final NoteDBHelper db;
 
   NoteRepositoryImpl(this.db);
 
@@ -18,7 +18,7 @@ class NoteRepositoryImpl extends NoteRepository {
   }
 
   @override
-  Future<List<Note>?> getNotes() async {
+  Future<List<Note>> getNotes() async {
     return await db.getNotes();
   }
 

@@ -1,10 +1,10 @@
 import 'package:clean_architecture_note/domain/model/note.dart';
 import 'package:sqflite/sqflite.dart';
 
-class NoteDB {
+class NoteDBHelper {
   final Database db;
 
-  NoteDB(this.db);
+  NoteDBHelper(this.db);
 
   Future<Note?> getNoteById(int id) async {
     // select * from note where id = 1
@@ -16,12 +16,12 @@ class NoteDB {
     return null;
   }
 
-  Future<List<Note>?> getNotes() async {
+  Future<List<Note>> getNotes() async {
     final List<Map<String, dynamic>> maps = await db.query('note');
     if (maps.isNotEmpty) {
       return maps.map((e) => Note.fromJson(e)).toList();
     }
-    return null;
+    return List.empty();
   }
 
   Future<void> insertNote(Note note) async {
