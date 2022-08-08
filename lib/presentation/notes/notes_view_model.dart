@@ -9,7 +9,9 @@ import 'package:flutter/material.dart';
 class NotesViewModel with ChangeNotifier {
   final NoteRepository repository;
 
-  NotesViewModel(this.repository);
+  NotesViewModel(this.repository) {
+    _loadNotes();
+  }
 
   NoteState _state = NoteState();
 
