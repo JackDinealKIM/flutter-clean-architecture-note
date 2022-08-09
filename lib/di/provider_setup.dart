@@ -1,7 +1,12 @@
 import 'package:clean_architecture_note/data/data_source/note_db_helper.dart';
 import 'package:clean_architecture_note/data/repository/note_repository_impl.dart';
 import 'package:clean_architecture_note/domain/repository/note_repository.dart';
-import 'package:clean_architecture_note/domain/use_case/get_note.dart';
+import 'package:clean_architecture_note/domain/use_case/add_note_use_case.dart';
+import 'package:clean_architecture_note/domain/use_case/delete_note_use_case.dart';
+import 'package:clean_architecture_note/domain/use_case/get_note_use_case.dart';
+import 'package:clean_architecture_note/domain/use_case/get_notes_use_case.dart';
+import 'package:clean_architecture_note/domain/use_case/update_note_use_case.dart';
+import 'package:clean_architecture_note/domain/use_case/use_cases.dart';
 import 'package:clean_architecture_note/presentation/add_edit_note/add_edit_note_view_model.dart';
 import 'package:clean_architecture_note/presentation/notes/notes_view_model.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +31,14 @@ Future<List<SingleChildWidget>> getProviders() async {
 
   NoteDBHelper dbHelper = NoteDBHelper(db);
   NoteRepository repository = NoteRepositoryImpl(dbHelper);
-  NotesViewModel notesViewModel = NotesViewModel(repository);
+  UseCases userCases = UseCases(
+    AddNoteUseCase(repository),
+    DeleteNoteUseCase(repository),
+    GetNoteUseCase(repository),
+    GetNotesUseCase(repository),
+    UpdateNoteUseCase(repository),
+  );
+  NotesViewModel notesViewModel = NotesViewModel(userCases);
   AddEditNoteViewModel addEditNoteViewModel = AddEditNoteViewModel(repository);
 
   return [

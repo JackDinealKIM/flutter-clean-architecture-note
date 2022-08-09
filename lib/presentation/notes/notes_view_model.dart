@@ -1,19 +1,23 @@
-import 'dart:collection';
-
 import 'package:clean_architecture_note/domain/model/note.dart';
-import 'package:clean_architecture_note/domain/repository/note_repository.dart';
+import 'package:clean_architecture_note/domain/use_case/use_cases.dart';
+import 'package:clean_architecture_note/domain/util/note_order.dart';
+import 'package:clean_architecture_note/domain/util/order_type.dart';
 import 'package:clean_architecture_note/presentation/notes/note_state.dart';
 import 'package:clean_architecture_note/presentation/notes/notes_event.dart';
 import 'package:flutter/material.dart';
 
 class NotesViewModel with ChangeNotifier {
-  final NoteRepository repository;
+  final UseCases userCases;
 
-  NotesViewModel(this.repository) {
+  NotesViewModel(this.userCases) {
     _loadNotes();
   }
 
-  NoteState _state = NoteState();
+  NoteState _state = NoteState(
+    notes: [],
+    noteOrder: NoteOrder.date(OrderType.descending()),
+    isOrderSectionVisible: false,
+  );
 
   NoteState get state => _state;
   Note? _recentlyDeletedNote;
@@ -23,24 +27,34 @@ class NotesViewModel with ChangeNotifier {
       loadNotes: _loadNotes,
       deleteNotes: (note) => _deleteNotes(note),
       restoreNote: _restoreNotes,
+      changeOrder: (NoteOrder noteOrder) {
+        _state = state.copyWith(noteOrder: noteOrder);
+        _loadNotes();
+      },
+      toggleOrderSection: () {
+        _state = state.copyWith(
+          isOrderSectionVisible: !state.isOrderSectionVisible,
+        );
+        notifyListeners();
+      },
     );
   }
 
   Future<void> _loadNotes() async {
-    List<Note> notes = await repository.getNotes();
+    List<Note> notes = await userCases.getNotes(state.noteOrder);
     _state = state.copyWith(notes: notes);
     notifyListeners();
   }
 
   Future<void> _deleteNotes(Note note) async {
     _recentlyDeletedNote = note;
-    await repository.deleteNote(note.id!);
+    await userCases.deleteNote(note.id!);
     await _loadNotes();
   }
 
   Future<void> _restoreNotes() async {
     if (_recentlyDeletedNote != null) {
-      await repository.insertNote(_recentlyDeletedNote!);
+      await userCases.addNote(_recentlyDeletedNote!);
       _recentlyDeletedNote = null;
       _loadNotes();
     }
